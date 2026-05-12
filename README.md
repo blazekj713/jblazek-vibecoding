@@ -2,7 +2,7 @@
 
 Welcome to the jblazek-vibecoding repository!
 
-## Overview xxx
+## Overview
 
 This project contains code and resources related to vibecoding. Feel free to explore and contribute!
 
