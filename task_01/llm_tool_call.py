@@ -1,3 +1,4 @@
+import argparse
 import os
 import json
 import requests
@@ -9,7 +10,8 @@ if not OPENAI_API_KEY:
     raise ValueError("Please set the environment variable OPENAI_API_KEY")
 
 OPENAI_API_URL = "https://api.openai.com/v1/chat/completions"
-MODEL = "gpt-4o-mini"
+MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+FALLBACK_MODELS = ["gpt-4o", "gpt-4o-mini"]
 
 # Bezpečný evaluátor výrazu pro jednoduché matematické výpočty.
 ALLOWED_OPERATORS = {
@@ -24,7 +26,11 @@ ALLOWED_OPERATORS = {
 
 
 def safe_eval(node):
-    if isinstance(node, ast.Num):
+    if isinstance(node, ast.Constant):
+        if isinstance(node.value, (int, float)):
+            return node.value
+        raise ValueError(f"Unsupported constant type: {type(node.value).__name__}")
+    if type(node).__name__ == "Num":
         return node.n
     if isinstance(node, ast.BinOp):
         left = safe_eval(node.left)
@@ -53,10 +59,10 @@ def call_openai(messages, functions=None, function_call="auto"):
         "model": MODEL,
         "messages": messages,
         "temperature": 0.2,
-        "function_call": function_call,
     }
     if functions is not None:
         payload["functions"] = functions
+        payload["function_call"] = function_call
 
     authorization_value = f"Bearer {OPENAI_API_KEY}"
     try:
@@ -76,11 +82,50 @@ def call_openai(messages, functions=None, function_call="auto"):
         json=payload,
         timeout=30,
     )
-    response.raise_for_status()
+
+    try:
+        response.raise_for_status()
+    except requests.HTTPError as exc:
+        error_text = response.text or str(exc)
+        if response.status_code == 400 and "model" in error_text.lower():
+            for fallback_model in FALLBACK_MODELS:
+                if fallback_model == payload["model"]:
+                    continue
+                payload["model"] = fallback_model
+                fallback_response = requests.post(
+                    OPENAI_API_URL,
+                    headers={
+                        "Authorization": authorization_value,
+                        "Content-Type": "application/json",
+                    },
+                    json=payload,
+                    timeout=30,
+                )
+                try:
+                    fallback_response.raise_for_status()
+                    return fallback_response.json()
+                except requests.HTTPError:
+                    continue
+        raise RuntimeError(
+            f"OpenAI request failed ({response.status_code}): {error_text}"
+        ) from exc
+
     return response.json()
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="Volání OpenAI funkce calculate s vlastním promptem.")
+    parser.add_argument(
+        "prompt",
+        nargs="?",
+        default="Kolik je (3 + 5) * 2?",
+        help="Uživatelský prompt pro LLM.",
+    )
+    return parser.parse_args()
+
+
 def main():
+    args = parse_args()
     messages = [
         {
             "role": "system",
@@ -88,7 +133,7 @@ def main():
         },
         {
             "role": "user",
-            "content": "Vypočítej prosím výraz: 1 + 1",
+            "content": args.prompt,
         },
     ]
 
@@ -131,7 +176,7 @@ def main():
             }
         )
 
-        final_response = call_openai(messages, function_call="none")
+        final_response = call_openai(messages, functions=functions, function_call="none")
         assistant_message = final_response["choices"][0]["message"]["content"]
         print("\nKonečná odpověď LLM:")
         print(assistant_message)
