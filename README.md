@@ -1,28 +1,10 @@
 # jblazek-vibecoding
 
-Welcome to the jblazek-vibecoding repository!
+Tento repozitář slouží jako rozcestník pro jednotlivé úkoly (tasky) v samostatných adresářích.
 
-## Overview
+## Tasky
 
-This project contains code and resources related to vibecoding. Feel free to explore and contribute!
+- [task_01](./task_01) – Python skript pro LLM API: implementace `task_01/llm_tool_call.py`, která volá OpenAI LLM API a využívá lokální nástroj pro výpočet.
 
-## Getting Started
 
-To get started with this project:
 
-1. Clone the repository
-2. Install dependencies
-3. Review the documentation
-4. Start coding!
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit pull requests or open issues for any bugs or feature requests.
-
-## License
-
-See the LICENSE file for details.
-
-## Contact
-
-For more information, please reach out to the repository maintainers.

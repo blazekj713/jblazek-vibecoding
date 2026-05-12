@@ -1,10 +1,19 @@
-Tvé zadání zní:
-👉 Python skript pro LLM API
-📍 Napiš Python skript, který zavolá LLM API, použije nástroj (např. výpočetní funkci) a vrátí odpověď zpět LLM.
+# Úkol 01: Python skript pro LLM API
 
-📄 Formát: Odkaz na svůj GitHub repozitář
+## Zadání
+- Napiš Python skript, který zavolá LLM API.
+- Skript musí použít nástroj (např. výpočetní funkci).
+- Výsledek se má vrátit zpět do LLM.
+- Formát: Odkaz na GitHub repozitář.
+- Deadline: **14. 5. 2026** 23:59
 
-📅 Deadline úkolu máš do 14. 5. 2026 23:59.
-📍 Maximální počet bodů, které můžeš získat je 100 bodů.
+## Volání
+- API key setup
+```bash
+export OPENAI_API_KEY="sk-proj-..."
+```
 
-🧪 Skript je implementován v `task_01/llm_tool_call.py`. Používá OpenAI LLM API a lokální nástroj pro výpočet.
+- Call
+```bash
+python3 task_01/llm_tool_call.py "Kolik je 10*23?"
+```
