@@ -88,7 +88,7 @@ def main():
         },
         {
             "role": "user",
-            "content": "Vypočítej prosím výraz: 52 * (13 - 5) + 120 / 4.",
+            "content": "Vypočítej prosím výraz: 1 + 1",
         },
     ]
 
