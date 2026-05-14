@@ -1,7 +1,7 @@
 import json
 from typing import Any, Dict
-
-import requests
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
 
 from skills import CodeGenerationSkill, CodeReviewSkill, Skill
 
@@ -12,13 +12,22 @@ class MCPClient:
         self.model = model
 
     def call(self, messages: Any) -> Dict[str, Any]:
-        payload = {
-            "model": self.model,
-            "messages": messages,
-        }
-        response = requests.post(self.server_url, json=payload, timeout=30)
-        response.raise_for_status()
-        return response.json()
+        payload = json.dumps({"model": self.model, "messages": messages}, ensure_ascii=False)
+        request = Request(
+            self.server_url,
+            data=payload.encode("utf-8"),
+            headers={"Content-Type": "application/json; charset=utf-8"},
+            method="POST",
+        )
+
+        try:
+            with urlopen(request, timeout=30) as response:
+                body = response.read().decode("utf-8")
+                return json.loads(body)
+        except HTTPError as exc:
+            raise RuntimeError(f"MCP server returned HTTP {exc.code}: {exc.reason}") from exc
+        except URLError as exc:
+            raise RuntimeError(f"Nelze se připojit k MCP serveru: {exc.reason}") from exc
 
 
 class CodingSubagent:
