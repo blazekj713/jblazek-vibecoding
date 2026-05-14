@@ -1,4 +1,4 @@
-# Úkol 02: Nastavení kódovacího agenta (Codex|Claude Code)
+# Úkol 02: Nastavení kódovacího agenta (Codex | Claude Code)
 
 ## Zadání
 - Nasdílejte nastavení Vašeho kódovacího agenta
