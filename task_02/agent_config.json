@@ -1,0 +1,20 @@
+{
+  "agents": {
+    "codex": {
+      "name": "Codex",
+      "server_url": "http://127.0.0.1:8000/mcp/codex",
+      "model": "codex-code-001",
+      "description": "Kódovací agent pro generování a úpravy kódu."
+    },
+    "claude_code": {
+      "name": "Claude Code",
+      "server_url": "http://127.0.0.1:8000/mcp/claude_code",
+      "model": "claude-code-1.0",
+      "description": "Agent pro analýzu kódu, review a vysvětlení."
+    }
+  },
+  "server": {
+    "host": "127.0.0.1",
+    "port": 8000
+  }
+}
